@@ -5,7 +5,7 @@
 ## Install
 
 ```
-asdf plugin-add go-jsonnet https://github.com/igorwwwwwwwwwwwwwwwwwwww/go-asdf-jsonnet.git
+asdf plugin-add go-jsonnet https://github.com/igorwwwwwwwwwwwwwwwwwwww/asdf-go-jsonnet.git
 ```
 
 ## Use
