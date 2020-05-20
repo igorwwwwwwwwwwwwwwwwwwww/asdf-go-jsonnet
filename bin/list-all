@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Must print a string with a space-separated list of versions. Example output would be the following:
+# 1.0.1 1.0.2 1.3.0 1.4
+
+cmd="curl -s"
+if [ -n "$GITHUB_API_TOKEN" ]; then
+  cmd="$cmd -H 'Authorization: token $GITHUB_API_TOKEN'"
+fi
+
+$cmd https://api.github.com/repos/google/go-jsonnet/releases | jq -r 'sort_by(.tag_name)|map((.tag_name|sub("^v"; "")))|join(" ")'

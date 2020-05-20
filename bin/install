@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+[ -z "${ASDF_INSTALL_TYPE+x}" ] && echo "ASDF_INSTALL_TYPE is required" && exit 1
+[ -z "${ASDF_INSTALL_VERSION+x}" ] && echo "ASDF_INSTALL_VERSION is required" && exit 1
+[ -z "${ASDF_INSTALL_PATH+x}" ] && echo "ASDF_INSTALL_PATH is required" && exit 1
+
+install() {
+  local install_type=$1
+  [ "$install_type" != "version" ] && echo "install type, $install_type, is not supported" && exit 1
+
+  local version=$2
+  local install_path=$3
+
+  if [ -z "${TMPDIR+x}" ]; then
+    local tmp_download_dir="$(mktemp -d)"
+  else
+    local tmp_download_dir="$TMPDIR"
+  fi
+
+  local download_url="https://github.com/google/go-jsonnet/archive/v${version}.tar.gz"
+
+  curl -sL "${download_url}" -o "${tmp_download_dir}/go-jsonnet_${version}.tar.gz" || exit 2
+  tar xf "${tmp_download_dir}/go-jsonnet_${version}.tar.gz" -C "${tmp_download_dir}" || exit 3
+
+  (
+    cd "${tmp_download_dir}"
+    go build ./cmd/jsonnet
+    go build ./cmd/jsonnetfmt
+  )
+
+  mkdir "${install_path}/bin"
+  cp "${tmp_download_dir}/jsonnet" "${tmp_download_dir}/jsonnetfmt" "${install_path}/bin/"
+}
+
+install "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
